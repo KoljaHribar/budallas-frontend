@@ -75,13 +75,12 @@ input {
 .top-bar { height: 110px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; }
 .game-info { display: flex; gap: 20px; align-items: center; width: 250px; }
 
-/* Trump Area - Display actual card */
+/* Trump Area */
 .trump-area {
     display: flex; flex-direction: column; align-items: center; gap: 5px;
 }
 .trump-area .label { font-size: 0.6rem; color: #cbd5e1; letter-spacing: 1px; }
 #trump-card-container .card {
-    /* Mini card override */
     width: 50px; height: 70px; font-size: 0.9rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     cursor: default;
@@ -94,14 +93,16 @@ input {
 
 /* Battle Status (Upper Middle) */
 .battle-status {
-    display: flex; align-items: center; gap: 20px;
+    display: flex; align-items: center; gap: 15px;
+    padding: 5px 15px; 
+    height: 40px;      
 }
 .status-role { display: flex; flex-direction: column; align-items: center; }
 .role-label { font-size: 0.6rem; color: #94a3b8; letter-spacing: 1px; margin-bottom: 2px; }
-.role-name { font-weight: 700; color: white; font-size: 1.1rem; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+.role-name { font-weight: 700; color: white; font-size: 1rem; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
 .vs-divider { font-weight: 800; color: rgba(255,255,255,0.2); font-size: 1.2rem; }
 
-/* Opponents */
+/* --- RE-ADDED MISSING SECTION: OPPONENTS --- */
 .opponents-row { display: flex; gap: 24px; justify-content: flex-end; width: 250px; }
 .opponent-card { display: flex; flex-direction: column; align-items: center; opacity: 0.6; }
 .opponent-card.active { opacity: 1; }
@@ -110,15 +111,43 @@ input {
     color: var(--text-dark); border-radius: 50%;
     display: flex; justify-content: center; align-items: center; font-weight: 700;
 }
+/* ------------------------------------------ */
 
 /* MAIN TABLE */
-.table-area { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; }
-.status-pill {
-    position: absolute; top: 10px;
-    background: rgba(255,255,255,0.9); color: var(--text-dark);
-    padding: 6px 16px; border-radius: 30px; font-weight: 600; font-size: 0.8rem;
+.table-area {
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; /* Stack message on top of table */
+    justify-content: flex-start; /* Start from top */
+    align-items: center; 
+    padding-top: 20px;
 }
-.battlefield { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; padding: 20px; }
+
+.status-pill {
+    position: relative; /* Fixed: No longer absolute */
+    top: auto; 
+    margin-bottom: 20px; 
+    background: var(--gold);
+    color: var(--text-dark);
+    padding: 8px 24px; 
+    border-radius: 30px; 
+    font-weight: 800; 
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+    z-index: 100;
+    animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.battlefield { 
+    display: flex; gap: 20px; flex-wrap: wrap; 
+    justify-content: center; 
+    width: 100%;
+}
 
 /* CARDS */
 .card-group { display: flex; flex-direction: column; gap: -30px; height: 160px; position: relative; }
@@ -137,11 +166,11 @@ input {
 .card.red { color: var(--danger); }
 .card.black { color: var(--text-dark); }
 
-/* NEW: Yellow Outline on Hover */
+/* Yellow Outline on Hover */
 .card:hover { 
     transform: translateY(-10px); 
     z-index: 10;
-    box-shadow: 0 0 0 4px var(--gold); /* YELLOW OUTLINE */
+    box-shadow: 0 0 0 4px var(--gold);
 }
 
 /* Selected States */
@@ -152,7 +181,7 @@ input {
 .player-area { padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
 .my-hand { display: flex; justify-content: center; }
 .my-hand .card { margin: 0 6px; }
-.my-hand .card:hover { margin: 0 12px; } /* More space on hover */
+.my-hand .card:hover { margin: 0 12px; }
 .controls-bar { display: flex; gap: 12px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 16px; }
 .action-btn {
     padding: 10px 24px; border-radius: 12px; border: none;
