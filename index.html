@@ -39,14 +39,22 @@
         </div>
     </div>
 
+    <div id="game-over-screen" class="overlay hidden" style="z-index: 100;">
+        <div class="glass-panel modal" style="border-color: #e74c3c;">
+            <h1 style="color: #e74c3c;">GAME OVER</h1>
+            <p id="game-over-message" class="subtitle" style="color: white; font-size: 1.2rem;">...</p>
+            <br>
+            <button onclick="restartGame()" class="primary-btn" style="background: #e74c3c;">Restart Game</button>
+        </div>
+    </div>
+
     <div id="game-interface" class="hidden">
         
         <header class="top-bar glass-panel-light">
             <div class="game-info">
                 <div class="trump-area">
                     <span class="label">TRUMP</span>
-                    <div id="trump-card-container">
-                        </div>
+                    <div id="trump-card-container"></div>
                 </div>
                 
                 <div class="deck-info">
@@ -82,6 +90,8 @@
                 <button class="action-btn defend" onclick="attemptAction('defend')">Defend</button>
                 <button class="action-btn take" onclick="attemptAction('take')">Take</button>
                 <button class="action-btn skip" onclick="attemptAction('skip')">Done</button>
+                
+                <button class="action-btn restart" onclick="restartGame()" style="background-color: #d35400; border-left: 1px solid rgba(255,255,255,0.2);">↻</button>
             </div>
             <div class="my-hand" id="my-hand"></div>
         </footer>
