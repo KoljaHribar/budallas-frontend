@@ -19,13 +19,23 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
+    background: url('../images/background.jpg') no-repeat center center fixed;
     background-size: cover;
 }
 
 body::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.4); z-index: -1;
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    
+    /* CHANGE THIS LINE */
+    /* This adds a 20% white layer on top of the image */
+    background: rgba(255, 255, 255, 0.2); 
+    
+    z-index: -1;
 }
 
 /* GLASS UTILS */
