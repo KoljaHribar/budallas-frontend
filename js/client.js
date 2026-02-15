@@ -332,3 +332,72 @@ window.toggleRules = function(show) {
         el.classList.add('hidden');
     }
 };
+
+// --- CHAT LOGIC ---
+let isChatOpen = false;
+let unreadCount = 0;
+
+window.toggleChat = function() {
+    isChatOpen = !isChatOpen;
+    const chatBox = document.getElementById('chat-container');
+    const badge = document.getElementById('chat-badge');
+    
+    if (isChatOpen) {
+        chatBox.classList.remove('hidden');
+        // Reset unread count
+        unreadCount = 0;
+        badge.innerText = "0";
+        badge.classList.add('hidden');
+        // Focus input
+        setTimeout(() => document.getElementById('chat-input').focus(), 100);
+    } else {
+        chatBox.classList.add('hidden');
+    }
+};
+
+window.sendChat = function() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    socket.emit('send_chat', {
+        message: msg,
+        name: myName, // Uses the global myName variable
+        room: myRoom
+    });
+    
+    input.value = ""; 
+};
+
+window.handleChatKey = function(e) {
+    if (e.key === 'Enter') sendChat();
+};
+
+// Listen for incoming messages
+socket.on('receive_chat', (data) => {
+    const chatBox = document.getElementById('chat-messages');
+    const msgElement = document.createElement('div');
+    
+    const isMe = (data.name === myName);
+    
+    // Structure: Name on top, message bubble below
+    msgElement.style.display = "flex";
+    msgElement.style.flexDirection = "column";
+    msgElement.style.alignItems = isMe ? "flex-end" : "flex-start";
+    
+    msgElement.innerHTML = `
+        <span class="chat-name">${isMe ? "You" : data.name}</span>
+        <div class="chat-msg ${isMe ? "my-msg" : "their-msg"}">${data.message}</div>
+    `;
+    
+    chatBox.appendChild(msgElement);
+    chatBox.scrollTop = chatBox.scrollHeight; 
+
+    // Handle Unread Notification
+    if (!isChatOpen) {
+        unreadCount++;
+        const badge = document.getElementById('chat-badge');
+        badge.innerText = unreadCount;
+        badge.classList.remove('hidden');
+    }
+});

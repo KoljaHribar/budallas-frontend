@@ -160,6 +160,22 @@
         </footer>
     </div>
 
+    <button id="chat-toggle-btn" onclick="toggleChat()" class="glass-pill">
+         Chat <span id="chat-badge" class="hidden">0</span>
+    </button>
+
+    <div id="chat-container" class="glass-panel hidden">
+        <div class="chat-header">
+            <span>Room Chat</span>
+            <button onclick="toggleChat()" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
+        </div>
+        <div id="chat-messages"></div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type..." maxlength="50" onkeypress="handleChatKey(event)">
+            <button id="btn-send-chat" onclick="sendChat()">➤</button>
+        </div>
+    </div>
+
     <script src="js/client.js"></script>
 </body>
 </html>
