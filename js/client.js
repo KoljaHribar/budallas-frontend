@@ -112,9 +112,14 @@ socket.on('game_update', (state) => {
 });
 
 socket.on('game_over', (data) => {
-    // Show the custom Game Over screen
+    // 1. Show the message
     ui.gameOverMsg.innerText = data.message;
     screens.gameOver.classList.remove('hidden');
+
+    // 2. Wait 5 seconds, then auto-click the button for them
+    setTimeout(() => {
+        returnToLobby();
+    }, 5000); // 5000 milliseconds = 5 seconds
 });
 
 socket.on('error', (data) => {
@@ -130,6 +135,23 @@ window.restartGame = function() {
         // Hide game over screen immediately to prevent double clicks
         screens.gameOver.classList.add('hidden');
     }
+};
+
+window.returnToLobby = function() {
+    // 1. Hide Game Over Screen
+    screens.gameOver.classList.add('hidden');
+    
+    // 2. Hide Game Interface
+    screens.game.classList.add('hidden');
+    
+    // 3. Show Lobby
+    screens.lobby.classList.remove('hidden');
+    
+    // 4. Reset local game state
+    gameState = null;
+    
+    // 5. Ensure "Start Game" button is visible (since we are back in lobby)
+    // (The server still knows we are in the room, so the list of players should still be there)
 };
 
 window.attemptAction = function(action) {
