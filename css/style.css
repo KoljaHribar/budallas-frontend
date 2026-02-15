@@ -190,6 +190,32 @@ input {
 
 /* MOBILE OPTIMIZATIONS */
 @media (max-width: 768px) {
+    /* 1. ALLOW PAGE SCROLLING */
+    body {
+        overflow-y: auto; /* Enables vertical scrolling */
+        height: auto;     /* Allows the body to grow tall */
+    }
+
+    /* 2. PREVENT INTERNAL SCROLLING TRAPS */
+    /* We want the whole page to scroll, not just the table box */
+    .table-area {
+        overflow-y: visible; 
+        flex: 0 0 auto;   /* Stop it from calculating strict height */
+        min-height: 300px; /* Ensure table has minimum space */
+    }
+
+    /* 3. ENSURE FOOTER IS REACHABLE */
+    .player-area {
+        position: relative;
+        padding-bottom: 40px; /* Extra space at bottom for safe scrolling */
+    }
+
+    /* ... keep your existing mobile styles below ... */
+    /* Login Screen Mobile Stacking */
+    .info-cards-container {
+        flex-direction: column;
+        align-items: center;
+    }
     /* Login Screen Mobile Stacking */
     .info-cards-container {
         flex-direction: column;
