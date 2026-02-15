@@ -12,15 +12,78 @@
 </head>
 <body>
 
-    <div id="login-overlay" class="overlay">
-        <div class="glass-panel modal">
+    <div id="login-overlay" class="overlay login-layout">
+        <div id="rules-overlay" class="overlay hidden" style="z-index: 2000;">
+            <div class="glass-panel modal" style="max-width: 600px; text-align: left; max-height: 80vh; overflow-y: auto;">
+                <h2 style="text-align: center; margin-bottom: 20px; color: var(--gold);">Game Rules</h2>
+                
+                <div style="font-size: 0.95rem; line-height: 1.6; color: #e2e8f0;">
+                    <p style="margin-bottom: 15px;">
+                        <strong>The Goal:</strong> Avoid being the last player holding cards. That person is the "Budala" (Fool).
+                    </p>
+
+                    <h4 style="color: var(--gold); margin-bottom: 5px;">Attack & Defense</h4>
+                    <ul style="margin-bottom: 15px; padding-left: 20px;">
+                        <li><strong>Attack:</strong> Play a card face-up. To attack again, you must match the rank of a card already on the table.</li>
+                        <li><strong>Defend:</strong> You must play a higher card of the same suit OR any <strong>Trump</strong> card.</li>
+                        <li><strong>Pass:</strong> If you have a card of the same rank as the attack, you can play it to "pass" the attack to your neighbor.</li>
+                    </ul>
+
+                    <h4 style="color: var(--gold); margin-bottom: 5px;">End of Round</h4>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li><strong>Success:</strong> If the defender beats all cards, they are discarded. The defender becomes the next attacker.</li>
+                        <li><strong>Failure:</strong> If the defender cannot beat the cards, they must pick up the whole pile and lose their turn to attack.</li>
+                    </ul>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="primary-btn" onclick="toggleRules(false)">Got it!</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glass-panel modal login-box">
             <h1>Budallas</h1>
-            <p class="subtitle">Join the game</p>
+            <p class="subtitle">Enter the Game</p>
             <div class="input-group">
                 <input type="text" id="username" placeholder="Your Name" autocomplete="off">
                 <input type="text" id="room" placeholder="Room ID" autocomplete="off">
             </div>
             <button id="btn-join" class="primary-btn">Enter Room</button>
+        </div>
+
+        <div class="info-cards-container">
+            
+            <div class="glass-panel info-card">
+                <h3>How to Play</h3>
+                <p>
+                    Budallas is a game of attack and defense. 
+                    There are no winners, only one loser, the "Budala".
+                </p>
+                <button class="action-btn" onclick="toggleRules(true)" style="margin-top: 10px; width: 100%; background: rgba(255,255,255,0.1);">Read Full Rules</button>
+            </div>
+
+            <div class="glass-panel info-card">
+                <h3>Game Origin</h3>
+                <p>
+                    Budallas is inspired by the classic game <em>Durak</em>, but with unique Balkan characteristics.
+                    The rules and game mechanics were influenced by Panther Hall 6th Floor.
+                    <br><br>
+                    It is a tradition that a player who loses 3 games in a row does a challenge
+                    given by the other players.
+                </p>
+            </div>
+
+            <div class="glass-panel info-card">
+                <h3>More Projects</h3>
+                <p>
+                    Enjoying the game? 
+                    Check out more projects from the author.
+                    <br><br>
+                    <a href="https://koljahribar.github.io/" style="color: var(--gold); text-decoration: none; font-weight: bold;">View Portfolio &rarr;</a>
+                </p>
+            </div>
+
         </div>
     </div>
 

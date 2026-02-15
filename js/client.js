@@ -300,3 +300,13 @@ function createCardElement(cardData) {
 function isSameCard(c1, c2) {
     return c1 && c2 && c1.rank === c2.rank && c1.suit === c2.suit;
 }
+
+// --- RULES MODAL LOGIC ---
+window.toggleRules = function(show) {
+    const el = document.getElementById('rules-overlay');
+    if (show) {
+        el.classList.remove('hidden');
+    } else {
+        el.classList.add('hidden');
+    }
+};

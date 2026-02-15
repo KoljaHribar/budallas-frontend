@@ -16,6 +16,7 @@ body {
     color: var(--text-light);
     margin: 0;
     height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -24,19 +25,77 @@ body {
 }
 
 body::before {
-    content: ''; 
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%;
-    
-    /* CHANGE THIS LINE */
-    /* This adds a 20% white layer on top of the image */
-    background: rgba(255, 255, 255, 0.2); 
-    
-    z-index: -1;
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.2); z-index: -1;
 }
+
+/* --- NEW LAYOUT FOR LOGIN SCREEN --- */
+.overlay.login-layout {
+    /* Change from center/center to column layout */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Aligns items to top */
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto; /* Allow scrolling if screen is short */
+}
+
+/* The Join Box - Upper Middle */
+.login-box {
+    margin-top: 8vh; /* Pushes it down slightly from top */
+    margin-bottom: 40px;
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* The Row of 3 Cards */
+.info-cards-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.info-card {
+    flex: 1; /* Equal width */
+    max-width: 350px;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: left;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    background: rgba(30, 41, 59, 0.85); /* Slightly darker on hover */
+}
+
+.info-card h3 {
+    margin-top: 0;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding-bottom: 10px;
+}
+
+.info-card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #cbd5e1;
+}
+
+/* --- EXISTING STYLES --- */
 
 /* GLASS UTILS */
 .glass-panel {
@@ -57,12 +116,12 @@ body::before {
     border: 1px solid rgba(255,255,255,0.1); padding: 5px 20px;
 }
 
-/* MODALS */
+/* MODALS (Generic) */
 .overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000;
 }
-.modal { padding: 2.5rem; width: 380px; border-radius: 24px; text-align: center; }
+.modal { padding: 2.5rem; width: 100%; max-width: 380px; border-radius: 24px; text-align: center; box-sizing: border-box; }
 .input-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
 input {
     padding: 14px; background: rgba(255, 255, 255, 0.1);
@@ -76,128 +135,97 @@ input {
 }
 .primary-btn:hover { transform: translateY(-2px); background: var(--primary-hover); }
 
+/* LOBBY & HEADER */
 .lobby-list-container { background: rgba(0,0,0,0.2); border-radius: 12px; margin-bottom: 20px; padding: 15px; text-align: left; }
 #lobby-player-list { list-style: none; padding: 0; margin: 10px 0 0 0; }
 #lobby-player-list li { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .hidden { display: none !important; }
 
-/* HEADER */
-.top-bar { height: 110px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; }
+.top-bar { height: 110px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; min-height: 80px; }
 .game-info { display: flex; gap: 20px; align-items: center; width: 250px; }
-
-/* Trump Area */
-.trump-area {
-    display: flex; flex-direction: column; align-items: center; gap: 5px;
-}
+.trump-area { display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .trump-area .label { font-size: 0.6rem; color: #cbd5e1; letter-spacing: 1px; }
-#trump-card-container .card {
-    width: 50px; height: 70px; font-size: 0.9rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    cursor: default;
-}
+#trump-card-container .card { width: 50px; height: 70px; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: default; }
 #trump-card-container .card:hover { transform: none; box-shadow: none; border: none; }
-
-/* Deck info */
 .deck-info { display: flex; flex-direction: column; align-items: center; color: #cbd5e1; font-size: 0.8rem; }
 .deck-icon { font-size: 1.5rem; }
 
-/* Battle Status (Upper Middle) */
-.battle-status {
-    display: flex; align-items: center; gap: 15px;
-    padding: 5px 15px; 
-    height: 40px;      
-}
+.battle-status { display: flex; align-items: center; gap: 15px; padding: 5px 15px; height: 40px; }
 .status-role { display: flex; flex-direction: column; align-items: center; }
 .role-label { font-size: 0.6rem; color: #94a3b8; letter-spacing: 1px; margin-bottom: 2px; }
 .role-name { font-weight: 700; color: white; font-size: 1rem; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
 .vs-divider { font-weight: 800; color: rgba(255,255,255,0.2); font-size: 1.2rem; }
 
-/* --- RE-ADDED MISSING SECTION: OPPONENTS --- */
 .opponents-row { display: flex; gap: 24px; justify-content: flex-end; width: 250px; }
 .opponent-card { display: flex; flex-direction: column; align-items: center; opacity: 0.6; }
 .opponent-card.active { opacity: 1; }
-.opponent-avatar {
-    width: 48px; height: 48px; background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
-    color: var(--text-dark); border-radius: 50%;
-    display: flex; justify-content: center; align-items: center; font-weight: 700;
-}
-/* ------------------------------------------ */
+.opponent-avatar { width: 48px; height: 48px; background: linear-gradient(135deg, #e2e8f0, #cbd5e1); color: var(--text-dark); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; }
 
-/* MAIN TABLE */
-.table-area {
-    flex: 1; 
-    display: flex; 
-    flex-direction: column; /* Stack message on top of table */
-    justify-content: flex-start; /* Start from top */
-    align-items: center; 
-    padding-top: 20px;
-}
+/* TABLE & CARDS */
+.table-area { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding-top: 20px; overflow-y: auto; width: 100%; }
+.status-pill { position: relative; top: auto; margin-bottom: 20px; background: var(--gold); color: var(--text-dark); padding: 8px 24px; border-radius: 30px; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4); z-index: 100; animation: popIn 0.3s ease-out; }
+@keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-.status-pill {
-    position: relative; /* Fixed: No longer absolute */
-    top: auto; 
-    margin-bottom: 20px; 
-    background: var(--gold);
-    color: var(--text-dark);
-    padding: 8px 24px; 
-    border-radius: 30px; 
-    font-weight: 800; 
-    font-size: 1rem;
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
-    z-index: 100;
-    animation: popIn 0.3s ease-out;
-}
-
-@keyframes popIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.battlefield { 
-    display: flex; gap: 20px; flex-wrap: wrap; 
-    justify-content: center; 
-    width: 100%;
-}
-
-/* CARDS */
+.battlefield { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 100%; padding-bottom: 20px; }
 .card-group { display: flex; flex-direction: column; gap: -30px; height: 160px; position: relative; }
 .card-group.pair .card:nth-child(2) { margin-top: -125px; margin-left: 20px; z-index: 2; transform: rotate(8deg); }
-
-.card {
-    width: 95px; height: 140px;
-    background: white; border-radius: 8px;
-    display: flex; flex-direction: column; justify-content: space-between;
-    padding: 8px; box-sizing: border-box;
-    font-weight: 700; font-size: 1.4rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-    user-select: none; cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
+.card { width: 95px; height: 140px; background: white; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; padding: 8px; box-sizing: border-box; font-weight: 700; font-size: 1.4rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); user-select: none; cursor: pointer; transition: all 0.2s; }
 .card.red { color: var(--danger); }
 .card.black { color: var(--text-dark); }
-
-/* Yellow Outline on Hover */
-.card:hover { 
-    transform: translateY(-10px); 
-    z-index: 10;
-    box-shadow: 0 0 0 4px var(--gold);
-}
-
-/* Selected States */
+.card:hover { transform: translateY(-10px); z-index: 10; box-shadow: 0 0 0 4px var(--gold); }
 .card.selected-hand { box-shadow: 0 0 0 4px var(--primary-green); transform: translateY(-20px); }
 .card.selected-target { box-shadow: 0 0 0 4px var(--blue); }
 
 /* FOOTER */
-.player-area { padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.my-hand { display: flex; justify-content: center; }
-.my-hand .card { margin: 0 6px; }
+.player-area { padding: 10px 20px 20px 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.my-hand { display: flex; justify-content: center; width: 100%; min-height: 120px; align-items: flex-end; }
+.my-hand .card { margin: 0 6px; transition: margin 0.2s; }
 .my-hand .card:hover { margin: 0 12px; }
-.controls-bar { display: flex; gap: 12px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 16px; }
-.action-btn {
-    padding: 10px 24px; border-radius: 12px; border: none;
-    font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.1); color: white;
-}
+.controls-bar { display: flex; gap: 12px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 16px; flex-wrap: wrap; justify-content: center; }
+.action-btn { padding: 10px 24px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.1); color: white; }
 .action-btn:hover { background: white; color: var(--text-dark); }
 .action-btn.attack { background: var(--danger); color: white; }
 .action-btn.defend { background: var(--blue); color: white; }
 .action-btn.pass { background: #f59e0b; color: white; }
+
+/* MOBILE OPTIMIZATIONS */
+@media (max-width: 768px) {
+    /* Login Screen Mobile Stacking */
+    .info-cards-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .info-card {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .login-box {
+        margin-top: 20px; /* Less top margin on phone */
+    }
+
+    /* Game UI Mobile Adjustments */
+    .top-bar { height: auto; padding: 10px; flex-direction: row; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .game-info, .opponents-row { width: auto; flex: 1; }
+    .game-info { justify-content: flex-start; }
+    .opponents-row { justify-content: flex-end; }
+    .battle-status { order: 3; width: 100%; justify-content: center; margin-top: 5px; }
+
+    .card { width: 65px; height: 96px; font-size: 1rem; padding: 4px; border-radius: 5px; }
+    .card-center { font-size: 1.5rem !important; }
+    .card-group { height: 110px; gap: -20px; }
+    .card-group.pair .card:nth-child(2) { margin-top: -85px; margin-left: 15px; }
+    
+    .my-hand .card { margin: 0 -5px; }
+    .my-hand .card:hover { margin: 0 5px; transform: translateY(-15px); }
+    .card.selected-hand { transform: translateY(-15px); }
+    
+    .controls-bar { width: 100%; gap: 8px; padding: 6px; }
+    .action-btn { padding: 8px 12px; font-size: 0.8rem; flex: 1; }
+    .action-btn.restart { width: auto; flex: 0; }
+    
+    .modal { padding: 1.5rem; width: 90%; }
+    .opponents-row { gap: 10px; }
+    .opponent-avatar { width: 36px; height: 36px; font-size: 0.9rem; }
+}
