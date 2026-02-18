@@ -162,7 +162,17 @@ input {
 .opponent-avatar { width: 48px; height: 48px; background: linear-gradient(135deg, #e2e8f0, #cbd5e1); color: var(--text-dark); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; }
 
 /* TABLE & CARDS */
-.table-area { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding-top: 20px; overflow-y: auto; width: 100%; }
+.table-area { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; /* CHANGED from flex-start to center */
+    align-items: center; 
+    padding-top: 20px; 
+    overflow-y: auto; 
+    width: 100%; 
+    min-height: 400px; /* Ensure it has space to center within */
+}
 .status-pill { position: relative; top: auto; margin-bottom: 20px; background: var(--gold); color: var(--text-dark); padding: 8px 24px; border-radius: 30px; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4); z-index: 100; animation: popIn 0.3s ease-out; }
 @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
@@ -312,10 +322,36 @@ input {
 #btn-send-chat { padding: 8px 15px; }
 
 /* Messages */
-.chat-msg { padding: 6px 10px; border-radius: 8px; font-size: 0.9rem; max-width: 80%; word-wrap: break-word; }
-.my-msg { align-self: flex-end; background: var(--blue); color: white; border-bottom-right-radius: 0; }
-.their-msg { align-self: flex-start; background: rgba(255,255,255,0.2); border-bottom-left-radius: 0; }
-.chat-name { font-size: 0.65rem; color: #cbd5e1; margin-bottom: 2px; }
+.chat-msg {
+    padding: 8px 12px;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    max-width: 80%;
+    word-wrap: break-word;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    margin-bottom: 5px;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.my-msg {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--blue), #2563eb);
+    color: white;
+    border-bottom-right-radius: 4px; /* Subtle "bubble" tail */
+}
+
+.their-msg {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-dark);
+    border-bottom-left-radius: 4px; /* Subtle "bubble" tail */
+}
+
+.chat-name {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin: 0 5px 2px 5px;
+}
 
 /* 3. MOBILE ADJUSTMENTS */
 @media (max-width: 768px) {
@@ -349,4 +385,12 @@ input {
     flex-wrap: wrap;
     justify-content: center;
     max-width: 100px;
+}
+
+/* A new class for the deck pile specifically */
+#trump-card-container .card.deck-pile {
+    background: linear-gradient(135deg, #1e293b, #0f172a); /* Dark back of card */
+    border: 1px solid rgba(255,255,255,0.2);
+    /* We will update box-shadow in JS */
+    transition: box-shadow 0.3s ease;
 }

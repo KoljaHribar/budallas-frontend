@@ -48,8 +48,15 @@ const ui = {
     trumpContainer: document.getElementById('trump-card-container'),
     deckCount: document.getElementById('deck-count'),
     statAttacker: document.getElementById('stat-attacker'),
-    statDefender: document.getElementById('stat-defender')
+    statDefender: document.getElementById('stat-defender'),
+
+    // [NEW] Reference to the chat toggle button
+    chatBtn: document.getElementById('chat-toggle-btn')
 };
+
+// --- INITIALIZATION ---
+// [NEW] Ensure chat button is hidden on the login screen
+ui.chatBtn.classList.add('hidden');
 
 // --- LOGIN EVENTS ---
 ui.btnJoin.addEventListener('click', () => {
@@ -63,6 +70,10 @@ ui.btnJoin.addEventListener('click', () => {
     
     screens.login.classList.add('hidden');
     screens.lobby.classList.remove('hidden');
+    
+    // [NEW] Show the chat button when entering lobby
+    ui.chatBtn.classList.remove('hidden');
+
     ui.lobbyRoomName.innerText = `Room: ${myRoom}`;
 
     socket.emit('join_game', { 
@@ -100,13 +111,16 @@ ui.btnStart.addEventListener('click', () => {
 
 socket.on('game_update', (state) => {
     gameState = state;
-    amISpectator = state.is_spectator; // [NEW] Update spectator status
+    amISpectator = state.is_spectator; // Update spectator status
     
     // Switch screens if needed
     if (!screens.lobby.classList.contains('hidden') || !screens.gameOver.classList.contains('hidden')) {
         screens.lobby.classList.add('hidden');
         screens.gameOver.classList.add('hidden');
         screens.game.classList.remove('hidden');
+        
+        // Ensure chat is visible in game (redundant safety)
+        ui.chatBtn.classList.remove('hidden');
     }
     
     renderGame();
@@ -120,7 +134,7 @@ socket.on('game_over', (data) => {
     // 2. Wait 5 seconds, then auto-click the button for them
     setTimeout(() => {
         returnToLobby();
-    }, 5000); // 5000 milliseconds = 5 seconds
+    }, 5000); 
 });
 
 socket.on('error', (data) => {
@@ -195,27 +209,82 @@ function resetSelection() {
 function renderGame() {
     if (!gameState) return;
 
-    // 1. HEADER INFO
+    // 1. HEADER INFO & VISUAL DECK
     ui.trumpContainer.innerHTML = '';
+    ui.trumpContainer.style.position = 'relative'; // Ensure we can stack cards
+
     if (gameState.trump_card) {
-        ui.trumpContainer.appendChild(createCardElement(gameState.trump_card));
+        // A. The Trump Card (Face Up at the Bottom)
+        const trumpEl = createCardElement(gameState.trump_card);
+        trumpEl.style.zIndex = "1"; // Base layer
+        
+        // B. The Deck Pile (Face Down on Top)
+        // Only show pile if we have more cards than just the visible trump
+        if (gameState.deck_count > 1) {
+            // Calculate shadow thickness based on cards remaining
+            // Approx 1px shadow for every 2 cards
+            const thickness = Math.max(1, Math.floor(gameState.deck_count / 2));
+            const shadowColor = '#94a3b8'; // Light grey/blueish edge
+            const cardBackBase = '#1e293b'; // Dark card back color
+            
+            // Generate a 3D stacked shadow string
+            let shadowStr = '';
+            for(let i = 1; i <= thickness; i++) {
+                shadowStr += `${i}px ${-i}px 0 ${cardBackBase}, ${i}px ${-i}px 0 1px ${shadowColor}`;
+                if(i < thickness) shadowStr += ', ';
+            }
+
+            // Create the deck element
+            const deckPile = document.createElement('div');
+            deckPile.className = 'card deck-pile'; 
+            deckPile.style.position = 'absolute';
+            deckPile.style.top = '-15px'; // Shifted up
+            deckPile.style.left = '15px'; // Shifted right
+            deckPile.style.zIndex = "2";  // On top of Trump
+            deckPile.style.boxShadow = shadowStr;
+            
+            // Add a texture pattern for the back
+            deckPile.style.background = `repeating-linear-gradient(
+                45deg,
+                #1e293b,
+                #1e293b 10px,
+                #334155 10px,
+                #334155 20px
+            )`;
+
+            ui.trumpContainer.appendChild(deckPile);
+        }
+        
+        // Add trump card to DOM
+        ui.trumpContainer.appendChild(trumpEl);
+        
     } else {
-        // If deck is empty/trump taken, show the suit symbol
+        // If deck is empty/trump taken, show just the suit symbol as a ghost
         ui.trumpContainer.innerText = gameState.trump_suit || "";
+        ui.trumpContainer.style.fontSize = "3rem";
+        ui.trumpContainer.style.opacity = "0.3";
     }
 
+    // Deck Count styling
     ui.deckCount.innerText = gameState.deck_count;
+    if (gameState.deck_count < 6) {
+        ui.deckCount.style.color = '#ef4444'; // Red warning
+        ui.deckCount.style.fontWeight = '800';
+    } else {
+        ui.deckCount.style.color = '#cbd5e1'; // Standard text
+        ui.deckCount.style.fontWeight = 'normal';
+    }
+
+    // Player Status
     ui.statAttacker.innerText = gameState.active_attacker_name || '-';
     ui.statDefender.innerText = gameState.defender_name || '-';
 
     // Status Message Logic
     if (amISpectator) {
-        // [NEW] Spectator Status
         ui.status.innerText = "YOU WON! SPECTATOR MODE";
         ui.status.style.background = "#10b981"; // Green
         ui.status.classList.remove('hidden');
     } else {
-        // Normal Status
         let statusText = "";
         if (gameState.active_attacker_name === myName) statusText = "Your Turn to ATTACK";
         else if (gameState.defender_name === myName) statusText = "DEFEND YOURSELF";
@@ -256,7 +325,7 @@ function renderOpponents() {
              htmlContent += `<div style="font-size:0.7rem; color:#cbd5e1; text-shadow:0 1px 2px black;">${p.card_count} cards</div>`;
         }
 
-        // [NEW] Spectator Logic: Show their actual cards if I am a spectator
+        // Spectator Logic: Show their actual cards if I am a spectator
         if (amISpectator && p.hand && p.hand.length > 0) {
             htmlContent += `<div class="spectator-hand-view">`;
             p.hand.forEach(c => {
@@ -323,7 +392,7 @@ function renderHand() {
     const me = gameState.players.find(p => p.is_me);
     ui.hand.innerHTML = '';
     
-    // [NEW] If I am a spectator, show a message instead of cards
+    // If I am a spectator, show a message instead of cards
     if (amISpectator) {
         ui.hand.innerHTML = '<div style="color:rgba(255,255,255,0.7); font-style:italic;">You have finished the game. Enjoy the show!</div>';
         return;
