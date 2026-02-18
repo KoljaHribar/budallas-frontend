@@ -166,12 +166,12 @@ input {
     flex: 1; 
     display: flex; 
     flex-direction: column; 
-    justify-content: center; /* CHANGED from flex-start to center */
+    justify-content: flex-start; /* REVERTED: Aligns items to top (Not Center) */
     align-items: center; 
     padding-top: 20px; 
     overflow-y: auto; 
     width: 100%; 
-    min-height: 400px; /* Ensure it has space to center within */
+    min-height: 400px; 
 }
 .status-pill { position: relative; top: auto; margin-bottom: 20px; background: var(--gold); color: var(--text-dark); padding: 8px 24px; border-radius: 30px; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4); z-index: 100; animation: popIn 0.3s ease-out; }
 @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -221,11 +221,6 @@ input {
     }
 
     /* ... keep your existing mobile styles below ... */
-    /* Login Screen Mobile Stacking */
-    .info-cards-container {
-        flex-direction: column;
-        align-items: center;
-    }
     /* Login Screen Mobile Stacking */
     .info-cards-container {
         flex-direction: column;
@@ -385,12 +380,4 @@ input {
     flex-wrap: wrap;
     justify-content: center;
     max-width: 100px;
-}
-
-/* A new class for the deck pile specifically */
-#trump-card-container .card.deck-pile {
-    background: linear-gradient(135deg, #1e293b, #0f172a); /* Dark back of card */
-    border: 1px solid rgba(255,255,255,0.2);
-    /* We will update box-shadow in JS */
-    transition: box-shadow 0.3s ease;
 }

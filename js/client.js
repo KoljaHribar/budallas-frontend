@@ -50,12 +50,16 @@ const ui = {
     statAttacker: document.getElementById('stat-attacker'),
     statDefender: document.getElementById('stat-defender'),
 
-    // [NEW] Reference to the chat toggle button
-    chatBtn: document.getElementById('chat-toggle-btn')
+    // Chat references
+    chatBtn: document.getElementById('chat-toggle-btn'),
+    chatBox: document.getElementById('chat-container'),
+    chatMsgs: document.getElementById('chat-messages'),
+    chatInput: document.getElementById('chat-input'),
+    chatBadge: document.getElementById('chat-badge')
 };
 
 // --- INITIALIZATION ---
-// [NEW] Ensure chat button is hidden on the login screen
+// Chat button visibility logic (Standard)
 ui.chatBtn.classList.add('hidden');
 
 // --- LOGIN EVENTS ---
@@ -71,7 +75,7 @@ ui.btnJoin.addEventListener('click', () => {
     screens.login.classList.add('hidden');
     screens.lobby.classList.remove('hidden');
     
-    // [NEW] Show the chat button when entering lobby
+    // Show chat in lobby
     ui.chatBtn.classList.remove('hidden');
 
     ui.lobbyRoomName.innerText = `Room: ${myRoom}`;
@@ -111,7 +115,7 @@ ui.btnStart.addEventListener('click', () => {
 
 socket.on('game_update', (state) => {
     gameState = state;
-    amISpectator = state.is_spectator; // Update spectator status
+    amISpectator = state.is_spectator; 
     
     // Switch screens if needed
     if (!screens.lobby.classList.contains('hidden') || !screens.gameOver.classList.contains('hidden')) {
@@ -119,7 +123,6 @@ socket.on('game_update', (state) => {
         screens.gameOver.classList.add('hidden');
         screens.game.classList.remove('hidden');
         
-        // Ensure chat is visible in game (redundant safety)
         ui.chatBtn.classList.remove('hidden');
     }
     
@@ -127,11 +130,10 @@ socket.on('game_update', (state) => {
 });
 
 socket.on('game_over', (data) => {
-    // 1. Show the message
     ui.gameOverMsg.innerText = data.message;
     screens.gameOver.classList.remove('hidden');
 
-    // 2. Wait 5 seconds, then auto-click the button for them
+    // Auto-return to lobby
     setTimeout(() => {
         returnToLobby();
     }, 5000); 
@@ -142,36 +144,24 @@ socket.on('error', (data) => {
     alert("Error: " + data.message);
 });
 
-// --- ACTIONS (Global for HTML onclick) ---
+// --- ACTIONS ---
 
 window.restartGame = function() {
     if (confirm("Are you sure you want to restart the game for everyone?")) {
         socket.emit('restart_game', {});
-        // Hide game over screen immediately to prevent double clicks
         screens.gameOver.classList.add('hidden');
     }
 };
 
 window.returnToLobby = function() {
-    // 1. Hide Game Over Screen
     screens.gameOver.classList.add('hidden');
-    
-    // 2. Hide Game Interface
     screens.game.classList.add('hidden');
-    
-    // 3. Show Lobby
     screens.lobby.classList.remove('hidden');
-    
-    // 4. Reset local game state
     gameState = null;
     amISpectator = false;
-    
-    // 5. Ensure "Start Game" button is visible
-    // (The server still knows we are in the room)
 };
 
 window.attemptAction = function(action) {
-    // Spectators cannot perform actions
     if (amISpectator) return;
 
     if (action === 'skip') { socket.emit('skip', {}); resetSelection(); return; }
@@ -199,7 +189,6 @@ window.attemptAction = function(action) {
 function resetSelection() {
     selectedHandCard = null;
     selectedTableCard = null;
-    // Clear visual selection classes immediately
     document.querySelectorAll('.card').forEach(c => c.classList.remove('selected-hand', 'selected-target'));
     renderGame();
 }
@@ -209,80 +198,29 @@ function resetSelection() {
 function renderGame() {
     if (!gameState) return;
 
-    // 1. HEADER INFO & VISUAL DECK
+    // 1. TRUMP & DECK (Original Simple Logic)
     ui.trumpContainer.innerHTML = '';
-    ui.trumpContainer.style.position = 'relative'; // Ensure we can stack cards
+    ui.deckCount.innerText = gameState.deck_count;
+    ui.deckCount.style.color = '#cbd5e1'; // Reset color
 
     if (gameState.trump_card) {
-        // A. The Trump Card (Face Up at the Bottom)
+        // Just render the trump card, no deck pile, no special stacking
         const trumpEl = createCardElement(gameState.trump_card);
-        trumpEl.style.zIndex = "1"; // Base layer
-        
-        // B. The Deck Pile (Face Down on Top)
-        // Only show pile if we have more cards than just the visible trump
-        if (gameState.deck_count > 1) {
-            // Calculate shadow thickness based on cards remaining
-            // Approx 1px shadow for every 2 cards
-            const thickness = Math.max(1, Math.floor(gameState.deck_count / 2));
-            const shadowColor = '#94a3b8'; // Light grey/blueish edge
-            const cardBackBase = '#1e293b'; // Dark card back color
-            
-            // Generate a 3D stacked shadow string
-            let shadowStr = '';
-            for(let i = 1; i <= thickness; i++) {
-                shadowStr += `${i}px ${-i}px 0 ${cardBackBase}, ${i}px ${-i}px 0 1px ${shadowColor}`;
-                if(i < thickness) shadowStr += ', ';
-            }
-
-            // Create the deck element
-            const deckPile = document.createElement('div');
-            deckPile.className = 'card deck-pile'; 
-            deckPile.style.position = 'absolute';
-            deckPile.style.top = '-15px'; // Shifted up
-            deckPile.style.left = '15px'; // Shifted right
-            deckPile.style.zIndex = "2";  // On top of Trump
-            deckPile.style.boxShadow = shadowStr;
-            
-            // Add a texture pattern for the back
-            deckPile.style.background = `repeating-linear-gradient(
-                45deg,
-                #1e293b,
-                #1e293b 10px,
-                #334155 10px,
-                #334155 20px
-            )`;
-
-            ui.trumpContainer.appendChild(deckPile);
-        }
-        
-        // Add trump card to DOM
         ui.trumpContainer.appendChild(trumpEl);
-        
     } else {
-        // If deck is empty/trump taken, show just the suit symbol as a ghost
         ui.trumpContainer.innerText = gameState.trump_suit || "";
         ui.trumpContainer.style.fontSize = "3rem";
         ui.trumpContainer.style.opacity = "0.3";
-    }
-
-    // Deck Count styling
-    ui.deckCount.innerText = gameState.deck_count;
-    if (gameState.deck_count < 6) {
-        ui.deckCount.style.color = '#ef4444'; // Red warning
-        ui.deckCount.style.fontWeight = '800';
-    } else {
-        ui.deckCount.style.color = '#cbd5e1'; // Standard text
-        ui.deckCount.style.fontWeight = 'normal';
     }
 
     // Player Status
     ui.statAttacker.innerText = gameState.active_attacker_name || '-';
     ui.statDefender.innerText = gameState.defender_name || '-';
 
-    // Status Message Logic
+    // Status Message
     if (amISpectator) {
         ui.status.innerText = "YOU WON! SPECTATOR MODE";
-        ui.status.style.background = "#10b981"; // Green
+        ui.status.style.background = "#10b981"; 
         ui.status.classList.remove('hidden');
     } else {
         let statusText = "";
@@ -291,7 +229,7 @@ function renderGame() {
         else statusText = `${gameState.active_attacker_name} is attacking...`;
         
         ui.status.innerText = statusText;
-        ui.status.style.background = "#fbbf24"; // Reset to Gold
+        ui.status.style.background = "#fbbf24"; 
         ui.status.classList.remove('hidden');
     }
 
@@ -306,9 +244,7 @@ function renderOpponents() {
         if (p.is_me) return;
         
         const el = document.createElement('div');
-        // Check if this player is in the winners list
         const isWinner = gameState.winners && gameState.winners.includes(p.name);
-        // Check if they are active
         const isActive = (gameState.active_attacker_name === p.name || gameState.defender_name === p.name);
         
         el.className = `opponent-card ${isActive ? 'active' : ''} ${isWinner ? 'winner-glow' : ''}`;
@@ -318,19 +254,16 @@ function renderOpponents() {
             <div style="font-size:0.8rem; color:white; margin-top:5px; font-weight:600; text-shadow:0 1px 2px black;">${p.name}</div>
         `;
 
-        // If they won, show TROPHY. Else, show card count.
         if (isWinner) {
              htmlContent += `<div style="color:#fbbf24; font-size:0.7rem; font-weight:bold;">🏆 WINNER</div>`;
         } else {
              htmlContent += `<div style="font-size:0.7rem; color:#cbd5e1; text-shadow:0 1px 2px black;">${p.card_count} cards</div>`;
         }
 
-        // Spectator Logic: Show their actual cards if I am a spectator
         if (amISpectator && p.hand && p.hand.length > 0) {
             htmlContent += `<div class="spectator-hand-view">`;
             p.hand.forEach(c => {
                  const isRed = ['♥', '♦'].includes(c.suit);
-                 // Mini card representation
                  htmlContent += `<span style="color:${isRed ? '#ff6b6b' : '#a0aec0'}; margin-right:4px; font-weight:bold;">${c.display}</span>`;
             });
             htmlContent += `</div>`;
@@ -377,7 +310,6 @@ function renderTable() {
         }
 
         cardEl.onclick = () => {
-            // Only defender needs to click table cards (and Spectators can't click)
             if (amISpectator || gameState.defender_name !== myName) return;
             selectedTableCard = (selectedTableCard && isSameCard(card, selectedTableCard)) ? null : card;
             renderGame(); 
@@ -392,7 +324,6 @@ function renderHand() {
     const me = gameState.players.find(p => p.is_me);
     ui.hand.innerHTML = '';
     
-    // If I am a spectator, show a message instead of cards
     if (amISpectator) {
         ui.hand.innerHTML = '<div style="color:rgba(255,255,255,0.7); font-style:italic;">You have finished the game. Enjoy the show!</div>';
         return;
@@ -418,7 +349,6 @@ function createCardElement(cardData) {
     const isRed = ['♥', '♦'].includes(cardData.suit);
     div.className = `card ${isRed ? 'red' : 'black'}`;
     
-    // Handle display string parsing safely
     const suitChar = cardData.suit;
     const displayStr = cardData.display || ""; 
     const rankStr = displayStr.replace(suitChar, '');
@@ -456,11 +386,9 @@ window.toggleChat = function() {
     
     if (isChatOpen) {
         chatBox.classList.remove('hidden');
-        // Reset unread count
         unreadCount = 0;
         badge.innerText = "0";
         badge.classList.add('hidden');
-        // Focus input
         setTimeout(() => document.getElementById('chat-input').focus(), 100);
     } else {
         chatBox.classList.add('hidden');
@@ -474,7 +402,7 @@ window.sendChat = function() {
 
     socket.emit('send_chat', {
         message: msg,
-        name: myName, // Uses the global myName variable
+        name: myName, 
         room: myRoom
     });
     
@@ -485,18 +413,17 @@ window.handleChatKey = function(e) {
     if (e.key === 'Enter') sendChat();
 };
 
-// Listen for incoming messages
 socket.on('receive_chat', (data) => {
     const chatBox = document.getElementById('chat-messages');
     const msgElement = document.createElement('div');
     
     const isMe = (data.name === myName);
     
-    // Structure: Name on top, message bubble below
     msgElement.style.display = "flex";
     msgElement.style.flexDirection = "column";
     msgElement.style.alignItems = isMe ? "flex-end" : "flex-start";
     
+    // Simple chat without extra bubble styling
     msgElement.innerHTML = `
         <span class="chat-name">${isMe ? "You" : data.name}</span>
         <div class="chat-msg ${isMe ? "my-msg" : "their-msg"}">${data.message}</div>
@@ -505,7 +432,6 @@ socket.on('receive_chat', (data) => {
     chatBox.appendChild(msgElement);
     chatBox.scrollTop = chatBox.scrollHeight; 
 
-    // Handle Unread Notification
     if (!isChatOpen) {
         unreadCount++;
         const badge = document.getElementById('chat-badge');
