@@ -329,3 +329,24 @@ input {
         bottom: 15px; right: 15px; /* Keeps button accessible */
     }
 }
+
+/* Highlights for winners */
+.opponent-card.winner-glow .opponent-avatar {
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 10px var(--gold);
+    background: var(--gold);
+    color: var(--text-dark);
+}
+
+/* The mini-cards under the opponent name */
+.spectator-hand-view {
+    margin-top: 5px;
+    background: rgba(0,0,0,0.6);
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 100px;
+}

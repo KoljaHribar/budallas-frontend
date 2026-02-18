@@ -1,5 +1,4 @@
 // --- CONFIGURATION ---
-// Replace with your actual Render URL
 const BACKEND_URL = "https://budallas-backend.onrender.com"; 
 
 const socket = io(BACKEND_URL, { 
@@ -13,6 +12,7 @@ let myName = "";
 let myRoom = "";
 let selectedHandCard = null;
 let selectedTableCard = null;
+let amISpectator = false; // Track if I am watching
 
 // --- USER ID LOGIC (Reconnection Support) ---
 let myUserId = localStorage.getItem("budallas_userId");
@@ -100,6 +100,7 @@ ui.btnStart.addEventListener('click', () => {
 
 socket.on('game_update', (state) => {
     gameState = state;
+    amISpectator = state.is_spectator; // [NEW] Update spectator status
     
     // Switch screens if needed
     if (!screens.lobby.classList.contains('hidden') || !screens.gameOver.classList.contains('hidden')) {
@@ -149,12 +150,16 @@ window.returnToLobby = function() {
     
     // 4. Reset local game state
     gameState = null;
+    amISpectator = false;
     
-    // 5. Ensure "Start Game" button is visible (since we are back in lobby)
-    // (The server still knows we are in the room, so the list of players should still be there)
+    // 5. Ensure "Start Game" button is visible
+    // (The server still knows we are in the room)
 };
 
 window.attemptAction = function(action) {
+    // Spectators cannot perform actions
+    if (amISpectator) return;
+
     if (action === 'skip') { socket.emit('skip', {}); resetSelection(); return; }
     if (action === 'take') { socket.emit('take', {}); resetSelection(); return; }
 
@@ -203,14 +208,23 @@ function renderGame() {
     ui.statAttacker.innerText = gameState.active_attacker_name || '-';
     ui.statDefender.innerText = gameState.defender_name || '-';
 
-    // Status Message
-    let statusText = "";
-    if (gameState.active_attacker_name === myName) statusText = "Your Turn to ATTACK";
-    else if (gameState.defender_name === myName) statusText = "DEFEND YOURSELF";
-    else statusText = `${gameState.active_attacker_name} is attacking...`;
-    
-    ui.status.innerText = statusText;
-    ui.status.classList.remove('hidden');
+    // Status Message Logic
+    if (amISpectator) {
+        // [NEW] Spectator Status
+        ui.status.innerText = "YOU WON! SPECTATOR MODE";
+        ui.status.style.background = "#10b981"; // Green
+        ui.status.classList.remove('hidden');
+    } else {
+        // Normal Status
+        let statusText = "";
+        if (gameState.active_attacker_name === myName) statusText = "Your Turn to ATTACK";
+        else if (gameState.defender_name === myName) statusText = "DEFEND YOURSELF";
+        else statusText = `${gameState.active_attacker_name} is attacking...`;
+        
+        ui.status.innerText = statusText;
+        ui.status.style.background = "#fbbf24"; // Reset to Gold
+        ui.status.classList.remove('hidden');
+    }
 
     renderOpponents();
     renderTable();
@@ -223,23 +237,45 @@ function renderOpponents() {
         if (p.is_me) return;
         
         const el = document.createElement('div');
-        // Highlight active players
+        // Check if this player is in the winners list
+        const isWinner = gameState.winners && gameState.winners.includes(p.name);
+        // Check if they are active
         const isActive = (gameState.active_attacker_name === p.name || gameState.defender_name === p.name);
-        el.className = `opponent-card ${isActive ? 'active' : ''}`;
         
-        el.innerHTML = `
+        el.className = `opponent-card ${isActive ? 'active' : ''} ${isWinner ? 'winner-glow' : ''}`;
+        
+        let htmlContent = `
             <div class="opponent-avatar">${p.name.charAt(0).toUpperCase()}</div>
             <div style="font-size:0.8rem; color:white; margin-top:5px; font-weight:600; text-shadow:0 1px 2px black;">${p.name}</div>
-            <div style="font-size:0.7rem; color:#cbd5e1; text-shadow:0 1px 2px black;">${p.card_count} cards</div>
         `;
+
+        // If they won, show TROPHY. Else, show card count.
+        if (isWinner) {
+             htmlContent += `<div style="color:#fbbf24; font-size:0.7rem; font-weight:bold;">🏆 WINNER</div>`;
+        } else {
+             htmlContent += `<div style="font-size:0.7rem; color:#cbd5e1; text-shadow:0 1px 2px black;">${p.card_count} cards</div>`;
+        }
+
+        // [NEW] Spectator Logic: Show their actual cards if I am a spectator
+        if (amISpectator && p.hand && p.hand.length > 0) {
+            htmlContent += `<div class="spectator-hand-view">`;
+            p.hand.forEach(c => {
+                 const isRed = ['♥', '♦'].includes(c.suit);
+                 // Mini card representation
+                 htmlContent += `<span style="color:${isRed ? '#ff6b6b' : '#a0aec0'}; margin-right:4px; font-weight:bold;">${c.display}</span>`;
+            });
+            htmlContent += `</div>`;
+        }
+
+        el.innerHTML = htmlContent;
         ui.opponents.appendChild(el);
     });
 }
 
 function renderTable() {
     ui.table.innerHTML = '';
-    const defCards = gameState.table_defense || []; // These come in pairs: [Attack, Defense, Attack, Defense...]
-    const attCards = gameState.table_attack || [];  // Unanswered attacks
+    const defCards = gameState.table_defense || []; 
+    const attCards = gameState.table_attack || [];
 
     // Render Defended Pairs
     for (let i = 0; i < defCards.length; i += 2) {
@@ -248,10 +284,10 @@ function renderTable() {
         if(!attackC || !defendC) continue;
 
         const group = document.createElement('div');
-        group.className = 'card-group pair'; // 'pair' class can add overlap styling in CSS
+        group.className = 'card-group pair'; 
         
         const aEl = createCardElement(attackC);
-        aEl.classList.add('beaten'); // Optional styling for beaten cards
+        aEl.classList.add('beaten'); 
         group.appendChild(aEl);
         
         const dEl = createCardElement(defendC);
@@ -272,10 +308,10 @@ function renderTable() {
         }
 
         cardEl.onclick = () => {
-            // Only defender needs to click table cards
-            if (gameState.defender_name !== myName) return;
+            // Only defender needs to click table cards (and Spectators can't click)
+            if (amISpectator || gameState.defender_name !== myName) return;
             selectedTableCard = (selectedTableCard && isSameCard(card, selectedTableCard)) ? null : card;
-            renderGame(); // Re-render to update selection
+            renderGame(); 
         };
 
         group.appendChild(cardEl);
@@ -286,6 +322,13 @@ function renderTable() {
 function renderHand() {
     const me = gameState.players.find(p => p.is_me);
     ui.hand.innerHTML = '';
+    
+    // [NEW] If I am a spectator, show a message instead of cards
+    if (amISpectator) {
+        ui.hand.innerHTML = '<div style="color:rgba(255,255,255,0.7); font-style:italic;">You have finished the game. Enjoy the show!</div>';
+        return;
+    }
+
     if (!me || !me.hand) return;
 
     me.hand.forEach(card => {
