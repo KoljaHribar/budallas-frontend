@@ -6,6 +6,14 @@ const socket = io(BACKEND_URL, {
     cors: { origin: "*" }
 });
 
+socket.on('connect', () => {
+    console.log("🟢 FRONTEND: Successfully connected to the backend server!");
+});
+
+socket.on('connect_error', (err) => {
+    console.error("🔴 FRONTEND: Connection Error:", err);
+});
+
 // --- STATE MANAGEMENT ---
 let gameState = null;
 let myName = "";
@@ -89,6 +97,7 @@ ui.btnJoin.addEventListener('click', () => {
 
 // --- LOBBY EVENTS ---
 socket.on('lobby_update', (data) => {
+    console.log("🔵 FRONTEND: Received lobby data from server:", data);
     const players = data.players || [];
     ui.lobbyList.innerHTML = '';
     players.forEach(pName => {
