@@ -439,3 +439,25 @@ socket.on('receive_chat', (data) => {
         badge.classList.remove('hidden');
     }
 });
+
+window.leaveRoom = function() {
+    if (confirm("Are you sure you want to leave the room?")) {
+        // 1. Tell the server
+        socket.emit('leave_game', {});
+        
+        // 2. Reset local variables
+        gameState = null;
+        myName = "";
+        myRoom = "";
+        
+        // 3. Switch back to login screen
+        screens.game.classList.add('hidden');
+        screens.lobby.classList.add('hidden');
+        screens.gameOver.classList.add('hidden');
+        screens.login.classList.remove('hidden');
+        
+        // Hide chat
+        ui.chatBtn.classList.add('hidden');
+        document.getElementById('chat-container').classList.add('hidden');
+    }
+};

@@ -97,7 +97,9 @@
             </div>
             <div id="lobby-controls">
                 <p id="lobby-status-text" class="status-text">Waiting for opponents...</p>
-                <button id="btn-start-game" class="primary-btn hidden">Start Game</button>
+                <button id="btn-start-game" class="primary-btn hidden" style="margin-bottom: 10px;">Start Game</button>
+                
+                <button onclick="leaveRoom()" class="primary-btn" style="background: #e74c3c;">Leave Room</button>
             </div>
         </div>
     </div>
@@ -154,8 +156,8 @@
                 <button class="action-btn take" onclick="attemptAction('take')">Take</button>
                 <button class="action-btn skip" onclick="attemptAction('skip')">Done</button>
                 
-                <button class="action-btn restart" onclick="restartGame()" style="background-color: #d35400; border-left: 1px solid rgba(255,255,255,0.2);">↻</button>
-            </div>
+                <button class="action-btn restart" onclick="restartGame()" style="background-color: #d35400; border-left: 1px solid rgba(255,255,255,0.2);">Restart</button>
+                <button class="action-btn leave" onclick="leaveRoom()" style="background: #e74c3c;">Leave Room</button>
             <div class="my-hand" id="my-hand"></div>
         </footer>
     </div>
