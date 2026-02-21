@@ -40,11 +40,97 @@ body::before {
     overflow-y: auto; /* Allow scrolling if screen is short */
 }
 
-/* The Join Box - Upper Middle */
+/* --- ENLARGED LOGIN BOX --- */
 .login-box {
-    margin-top: 8vh; /* Pushes it down slightly from top */
-    margin-bottom: 40px;
+    width: 90%;
+    max-width: 800px; /* Makes it wide on Mac/iPad */
+    min-height: 50vh; /* Fills half the vertical height of the screen */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers the content vertically inside the big box */
+    align-items: center;     /* Centers the content horizontally */
+    margin-top: 8vh;
+    margin-bottom: 30px;
     animation: slideDown 0.5s ease-out;
+}
+
+/* --- SUPER-SIZED LOGIN BOX --- */
+.modal.login-box {
+    width: 95%;
+    max-width: 1000px; /* Pushed wider (was 800px) */
+    min-height: 65vh;  /* Pushed taller, taking up 65% of screen height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;     
+    margin-top: 5vh; /* Adjusted to fit the taller box beautifully */
+    margin-bottom: 40px;
+    padding: 4rem 2rem; /* Adds more internal breathing room */
+    animation: slideDown 0.5s ease-out;
+}
+
+/* Massive title to fit the massive box */
+.login-box h1 {
+    font-size: 5rem; /* Scaled up from 4rem */
+    margin: 0 0 15px 0;
+    color: var(--gold);
+    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.login-box .subtitle {
+    font-size: 1.5rem; /* Scaled up to match */
+    margin-bottom: 50px;
+    color: #e2e8f0;
+}
+
+/* Slightly wider inputs so they don't look tiny inside the giant box */
+.login-box .input-group,
+.login-box #btn-join {
+    width: 100%;
+    max-width: 400px; 
+}
+
+/* --- SUPER-SIZED LOBBY BOX --- */
+.modal.lobby-box {
+    width: 95%;
+    max-width: 1000px;
+    min-height: 65vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 2rem;
+    animation: slideDown 0.5s ease-out;
+}
+
+/* Match the giant title from the login screen */
+.lobby-box h2 {
+    font-size: 5rem;
+    margin: 0 0 15px 0;
+    color: var(--gold);
+    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.lobby-box .subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    color: #e2e8f0;
+}
+
+/* Make the player list wider so it looks proportional */
+.lobby-box .lobby-list-container {
+    width: 100%;
+    max-width: 500px; 
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+/* Keep the buttons a normal size */
+.lobby-box #lobby-controls {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes slideDown {
@@ -52,47 +138,9 @@ body::before {
     to { transform: translateY(0); opacity: 1; }
 }
 
-/* The Row of 3 Cards */
-.info-cards-container {
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    justify-content: center;
-    width: 100%;
-    max-width: 1200px;
-    animation: fadeIn 0.8s ease-out;
-}
-
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-}
-
-.info-card {
-    flex: 1; /* Equal width */
-    max-width: 350px;
-    padding: 20px;
-    border-radius: 16px;
-    text-align: left;
-    transition: transform 0.2s, background 0.2s;
-}
-
-.info-card:hover {
-    transform: translateY(-5px);
-    background: rgba(30, 41, 59, 0.85); /* Slightly darker on hover */
-}
-
-.info-card h3 {
-    margin-top: 0;
-    color: var(--gold);
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    padding-bottom: 10px;
-}
-
-.info-card p {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: #cbd5e1;
 }
 
 /* --- EXISTING STYLES --- */
@@ -221,19 +269,24 @@ input {
     }
 
     /* ... keep your existing mobile styles below ... */
-    /* Login Screen Mobile Stacking */
-    .info-cards-container {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .info-card {
-        width: 100%;
-        max-width: 100%;
-    }
     
     .login-box {
-        margin-top: 20px; /* Less top margin on phone */
+        min-height: auto; /* Let the height shrink naturally on small screens */
+        padding: 30px 20px;
+        margin-top: 5vh;
+    }
+    
+    .login-box h1 {
+        font-size: 2.8rem; /* Scale down the giant title */
+    }
+
+    .modal.lobby-box {
+        min-height: auto;
+        padding: 30px 20px;
+    }
+    
+    .lobby-box h2 {
+        font-size: 2.8rem;
     }
 
     /* Game UI Mobile Adjustments */
@@ -380,4 +433,31 @@ input {
     flex-wrap: wrap;
     justify-content: center;
     max-width: 100px;
+}
+
+/* --- NEW INFO RECTANGLES --- */
+.info-rectangles-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px; /* Rests naturally below the login box */
+    animation: fadeIn 0.8s ease-out;
+    max-width: 600px;
+}
+
+.info-rect {
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    color: #cbd5e1;
+    transition: all 0.2s ease;
+}
+
+.info-rect:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }

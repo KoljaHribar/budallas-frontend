@@ -374,14 +374,28 @@ function isSameCard(c1, c2) {
     return c1 && c2 && c1.rank === c2.rank && c1.suit === c2.suit;
 }
 
-// --- RULES MODAL LOGIC ---
-window.toggleRules = function(show) {
-    const el = document.getElementById('rules-overlay');
-    if (show) {
-        el.classList.remove('hidden');
-    } else {
+// --- INFO MODAL LOGIC ---
+window.openInfoModal = function(sectionId) {
+    // 1. Hide all content blocks inside the modal
+    document.querySelectorAll('.info-content').forEach(el => {
         el.classList.add('hidden');
-    }
+    });
+    
+    // 2. Unhide the specific block the user requested
+    document.getElementById('content-' + sectionId).classList.remove('hidden');
+    
+    // 3. Show the overlay itself
+    document.getElementById('info-overlay').classList.remove('hidden');
+};
+
+window.closeInfoModal = function() {
+    document.getElementById('info-overlay').classList.add('hidden');
+};
+
+// Keep this wrapper in case toggleRules(true) is called from somewhere else in the game
+window.toggleRules = function(show) {
+    if (show) openInfoModal('rules');
+    else closeInfoModal();
 };
 
 // --- CHAT LOGIC ---
