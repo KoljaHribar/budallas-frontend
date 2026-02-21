@@ -50,7 +50,7 @@ const ui = {
     lobbyStatus: document.getElementById('lobby-status-text'),
     btnStart: document.getElementById('btn-start-game'),
 
-    // Game Board references (THESE GOT DELETED!)
+    // Game Board references
     hand: document.getElementById('my-hand'),
     table: document.getElementById('battlefield'),
     opponents: document.getElementById('opponents-container'),
@@ -62,7 +62,7 @@ const ui = {
     deckContainer: document.getElementById('deck-container'),
     deckCount: document.getElementById('deck-count'),
     statAttacker: document.getElementById('stat-attacker'),
-    statDefender: document.getElementById('stat-defender'), // (THIS GOT DELETED TOO!)
+    statDefender: document.getElementById('stat-defender'),
 
     // Chat references
     chatBtn: document.getElementById('chat-toggle-btn'),
