@@ -38,25 +38,31 @@ const screens = {
 };
 
 const ui = {
+    // Login references
+    loginForm: document.getElementById('login-form'), 
     nameInput: document.getElementById('username'),
     roomInput: document.getElementById('room'),
     btnJoin: document.getElementById('btn-join'),
     
+    // Lobby references
     lobbyRoomName: document.getElementById('lobby-room-name'),
     lobbyList: document.getElementById('lobby-player-list'),
     lobbyStatus: document.getElementById('lobby-status-text'),
     btnStart: document.getElementById('btn-start-game'),
 
+    // Game Board references (THESE GOT DELETED!)
     hand: document.getElementById('my-hand'),
     table: document.getElementById('battlefield'),
     opponents: document.getElementById('opponents-container'),
     status: document.getElementById('status-message'),
     gameOverMsg: document.getElementById('game-over-message'),
     
+    // Top Bar references
     trumpContainer: document.getElementById('trump-card-container'),
     deckContainer: document.getElementById('deck-container'),
     deckCount: document.getElementById('deck-count'),
     statAttacker: document.getElementById('stat-attacker'),
+    statDefender: document.getElementById('stat-defender'), // (THIS GOT DELETED TOO!)
 
     // Chat references
     chatBtn: document.getElementById('chat-toggle-btn'),
