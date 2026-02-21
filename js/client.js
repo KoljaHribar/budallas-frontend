@@ -54,9 +54,9 @@ const ui = {
     gameOverMsg: document.getElementById('game-over-message'),
     
     trumpContainer: document.getElementById('trump-card-container'),
+    deckContainer: document.getElementById('deck-container'),
     deckCount: document.getElementById('deck-count'),
     statAttacker: document.getElementById('stat-attacker'),
-    statDefender: document.getElementById('stat-defender'),
 
     // Chat references
     chatBtn: document.getElementById('chat-toggle-btn'),
@@ -207,24 +207,47 @@ function resetSelection() {
 function renderGame() {
     if (!gameState) return;
 
-    // 1. TRUMP & DECK (Original Simple Logic)
+    // 1. TRUMP & DECK (New 3D Stack Logic)
     ui.trumpContainer.innerHTML = '';
+    ui.deckContainer.innerHTML = ''; // Clear the deck stack
+    
+    // Update the counter text
     ui.deckCount.innerText = gameState.deck_count;
-    ui.deckCount.style.color = '#cbd5e1'; // Reset color
 
-    if (gameState.trump_card) {
-        // Just render the trump card, no deck pile, no special stacking
+    // Render Trump Card (Bottom Layer)
+    if (gameState.trump_card && gameState.deck_count > 0) {
         const trumpEl = createCardElement(gameState.trump_card);
         ui.trumpContainer.appendChild(trumpEl);
-    } else {
-        ui.trumpContainer.innerText = gameState.trump_suit || "";
+    } else if (gameState.deck_count === 0 && gameState.trump_suit) {
+        // If the deck is empty, just show a faded suit symbol
+        ui.trumpContainer.innerText = gameState.trump_suit;
         ui.trumpContainer.style.fontSize = "3rem";
         ui.trumpContainer.style.opacity = "0.3";
+    }
+
+    // Render Deck Stack (Top Layer)
+    if (gameState.deck_count > 0) {
+        // Create up to 5 overlapping cards to simulate a physical deck's thickness
+        const visibleCards = Math.min(gameState.deck_count, 5); 
+        
+        for (let i = 0; i < visibleCards; i++) {
+            const backEl = document.createElement('div');
+            backEl.className = 'card-back';
+            // Stagger each card slightly upwards and to the left for vertical 3D depth
+            backEl.style.transform = `translate(${i * -2}px, ${i * -2}px)`;
+            
+            // If it's the very last card in the deck (the trump card itself), don't draw a back!
+            if (gameState.deck_count === 1) break; 
+            
+            ui.deckContainer.appendChild(backEl);
+        }
     }
 
     // Player Status
     ui.statAttacker.innerText = gameState.active_attacker_name || '-';
     ui.statDefender.innerText = gameState.defender_name || '-';
+    
+    // ... rest of your renderGame code ...
 
     // Status Message
     if (amISpectator) {

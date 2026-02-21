@@ -189,14 +189,99 @@ input {
 #lobby-player-list li { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .hidden { display: none !important; }
 
-.top-bar { height: 110px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; min-height: 80px; }
-.game-info { display: flex; gap: 20px; align-items: center; width: 250px; }
-.trump-area { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.trump-area .label { font-size: 0.6rem; color: #cbd5e1; letter-spacing: 1px; }
-#trump-card-container .card { width: 50px; height: 70px; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: default; }
-#trump-card-container .card:hover { transform: none; box-shadow: none; border: none; }
-.deck-info { display: flex; flex-direction: column; align-items: center; color: #cbd5e1; font-size: 0.8rem; }
-.deck-icon { font-size: 1.5rem; }
+.top-bar { 
+    height: 130px; /* Slightly taller to comfortably fit our new 3D deck stack */
+    padding: 0 30px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    min-height: 100px; 
+}
+
+/* --- DECK & TRUMP STACK --- */
+.game-info { 
+    display: flex; 
+    align-items: center; 
+    width: 250px; 
+    justify-content: center;
+}
+
+.deck-trump-layout {
+    display: flex;
+    gap: 20px; /* Space between trump and deck */
+    margin-top: 15px; /* Push down slightly so top label has room */
+}
+
+/* 1. Create rigid, identical boxes so the cards align flawlessly */
+.trump-zone, .deck-zone {
+    position: relative;
+    width: 95px;
+    height: 140px;
+}
+
+/* 2. Scale both cards down inside their rigid boxes */
+#trump-card-container, #deck-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    transform: scale(0.85);
+    transform-origin: center center;
+}
+
+/* 3. Pin the label snugly below the trump card */
+.trump-label {
+    position: absolute;
+    bottom: -28px; /* The baseline for our text */
+    left: 0; 
+    width: 100%;
+    text-align: center;
+    font-size: 0.7rem; /* Slightly larger to balance with the badge */
+    color: #cbd5e1;
+    letter-spacing: 1px;
+    font-weight: bold;
+    z-index: 10;
+    line-height: 1;
+}
+
+/* 4. Pin the badge safely below the deck */
+.deck-count-badge {
+    position: absolute;
+    bottom: -34px; /* Pushed exactly 6px lower to account for its padding */
+    left: 50%;
+    transform: translateX(-50%); 
+    background: rgba(0,0,0,0.5);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--gold);
+    font-weight: bold;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    white-space: nowrap; 
+    z-index: 10;
+    line-height: 1;
+}
+
+/* --- THE CASINO CARD BACK --- */
+.card-back {
+    width: 95px;
+    height: 140px;
+    background-color: #7f1d1d; 
+    background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(251, 191, 36, 0.15) 4px, rgba(251, 191, 36, 0.15) 5px), 
+        repeating-linear-gradient(-45deg, transparent, transparent 4px, rgba(251, 191, 36, 0.15) 4px, rgba(251, 191, 36, 0.15) 5px);
+    border: 5px solid white; 
+    border-radius: 8px;
+    box-shadow: -2px 2px 8px rgba(0,0,0,0.5);
+    position: absolute; /* Absolute ONLY inside the deck-container */
+    top: 0; left: 0;
+}
+
+.card-back::after {
+    content: ''; position: absolute;
+    top: 3px; left: 3px; right: 3px; bottom: 3px;
+    border: 1px solid rgba(251, 191, 36, 0.6);
+    border-radius: 3px; pointer-events: none;
+}
 
 .battle-status { display: flex; align-items: center; gap: 15px; padding: 5px 15px; height: 40px; }
 .status-role { display: flex; flex-direction: column; align-items: center; }
